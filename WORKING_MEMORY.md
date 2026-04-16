@@ -92,3 +92,20 @@ Estimated need: 100K-300K diverse tokens for 90%+ on Qwen.
 2. Train output-only bottleneck with proper data scale
 3. If output reaches 90%+, add inter-layer bottlenecks incrementally
 4. OR: go back to BitNet where 97% is already proven, build full ORBIT there
+
+## DEFINITIVE OUTPUT-ONLY TEST (C4 real text, 27K tokens, 200 epochs)
+Qwen 0.5B (H=896):
+  rank-32: 33.8%, rank-64: 37.1%, rank-128: 40.6%, rank-256: 42.6%
+  
+CONCLUSION: Qwen 0.5B output is NOT compressible like BitNet.
+- BitNet Hydra rank-64 = 97% (on 98K model-specific tokens)
+- Qwen 0.5B rank-256 = 42.6% (on 27K C4 tokens)
+
+Likely causes:
+1. H=896 is too small — less redundancy than H=2560
+2. BitNet ternary weights → cleaner manifold (spin-glass ground state)
+3. C4 real text is harder than model-generated text
+
+NEXT: Test on larger model (H=1536 or H=2048+) OR go back to BitNet.
+The physics (7-dim manifold, orbital confinement) is real. The 
+compression just needs a model with enough redundancy to exploit.
