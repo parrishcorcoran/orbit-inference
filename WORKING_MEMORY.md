@@ -64,3 +64,31 @@
 - KL: 13.4 → 0.19 (training converges, generalization plateaus)
 - All 128 dims survived L1 (too weak or needed)
 - CONCLUSION: approach works, needs 100K-300K tokens for 90%+ target
+
+## OUTPUT-ONLY BOTTLENECK (no chain reaction)
+Qwen 0.5B (H=896, 27K train tokens, 100 epochs):
+  rank-32: 47.3%, rank-64: 51.2%, rank-128: 57.6%, rank-256: 55.7% (overfits)
+  Peak at rank-128. Drops at rank-256 = overfitting (too many params for 27K tokens).
+
+Qwen 1.5B (H=1536, 2.2K train tokens, 100 epochs):
+  rank-64: 32.9%, rank-512: 36.3%
+  Massively undertrained. 2.2K tokens for 1.6M param bottleneck.
+
+BitNet 2B Hydra (H=2560, 98K train tokens, 1000 steps):
+  rank-64: 97%  ← THE GOLD STANDARD
+
+## THE PATTERN
+Every result improves with more training data:
+  PCA (0 training): 17%
+  KL 8K tokens: 51%
+  KL 33K tokens: 68%
+  Hydra 98K tokens: 97%
+
+The approach WORKS. It's a data scaling problem, not an architecture problem.
+Estimated need: 100K-300K diverse tokens for 90%+ on Qwen.
+
+## WHAT TO DO NEXT
+1. Generate 100K+ training tokens from Qwen (takes ~30 min on GPU)
+2. Train output-only bottleneck with proper data scale
+3. If output reaches 90%+, add inter-layer bottlenecks incrementally
+4. OR: go back to BitNet where 97% is already proven, build full ORBIT there
