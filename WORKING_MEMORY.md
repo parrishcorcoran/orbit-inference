@@ -134,3 +134,18 @@ For a fair test, need either:
 2. Or: train on actual model logits (run the model, capture outputs)
 
 The Q4_K_M dequant introduced ~5% token-level noise floor.
+
+## LLAMA 8B COMPLETE (Q4_K_M lm_head — INCONCLUSIVE)
+  rank-32: 10.3%, rank-64: 10.7%, rank-128: 11.9%, rank-256: 12.3%
+  
+FLAT at ~10-12% regardless of rank = Q4_K_M NOISE FLOOR.
+The dequantized lm_head has ~10% argmax corruption from quantization.
+The bottleneck learns to the noise ceiling, not the compression limit.
+
+THIS TEST DOES NOT MEASURE COMPRESSIBILITY. It measures quantization noise.
+
+TO GET A REAL ANSWER: need full-precision lm_head.
+Options:
+1. Download Llama 8B HF weights (requires Meta license + ~16GB)
+2. Use Qwen 3B (already loaded, full precision) with MORE training data
+3. Train on BitNet where Hydra already proved 97%
