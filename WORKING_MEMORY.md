@@ -121,3 +121,16 @@ Key: the architecture SELF-SELECTS. Easy tokens exit early, hard tokens get full
 This is the 7-dim gate in action — even without our trained gate, raw confidence works.
 
 Next: Engine B (KV masking) + larger context + both engines simultaneously
+
+## LLAMA 8B OUTPUT BOTTLENECK (dequantized Q4_K_M lm_head)
+  rank-32: 10.3%, rank-64: 10.7% (running rank-128, 256)
+  
+CAVEAT: lm_head was dequantized from Q4_K_M (4.5 bits/weight).
+The quantization noise in the lm_head corrupts the training targets.
+The bottleneck is fitting noisy labels. This likely explains the low accuracy.
+
+For a fair test, need either:
+1. Full-precision Llama 8B lm_head (download HF weights)
+2. Or: train on actual model logits (run the model, capture outputs)
+
+The Q4_K_M dequant introduced ~5% token-level noise floor.
