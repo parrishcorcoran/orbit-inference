@@ -149,3 +149,26 @@ Options:
 1. Download Llama 8B HF weights (requires Meta license + ~16GB)
 2. Use Qwen 3B (already loaded, full precision) with MORE training data
 3. Train on BitNet where Hydra already proved 97%
+
+## COMPREHENSIVE OUTPUT BOTTLENECK COMPARISON (all models)
+
+                    rank-32  rank-64  rank-128  rank-256  rank-512
+Qwen 0.5B (H=896)   33.8%   37.1%    40.6%     42.6%     —
+Qwen 3B   (H=2048)  33.4%   39.7%    43.0%     43.6%     running
+Llama 8B  (H=4096)  10.3%   10.7%    11.9%     12.3%     — (Q4 noise floor)
+BitNet 2B (H=2560)    —     97.0%      —         —        — (Hydra, different training)
+
+KEY FINDING: Standard models (Qwen) plateau at ~43% regardless of model size.
+BitNet achieves 97% — a 55-point gap that is NOT explained by hidden dim.
+
+Possible explanations for BitNet's advantage:
+1. Ternary weights create discrete, clean decision boundaries (spin-glass)
+2. Hydra training (98K tokens, 1000 steps) vs our 52K/200ep — but scaling trend suggests more data won't reach 97%
+3. BitNet's hidden states may be more structured (lower effective rank at output)
+4. Hydra uses the ACTUAL Medusa head architecture (which includes residual connections and is deeper than our simple enc→SiLU→dec)
+
+NEXT STEPS:
+1. Try Hydra's ACTUAL architecture on Qwen (residual + deeper network)
+2. Try on BitNet with cached data (where 97% is proven) to validate our training pipeline
+3. Or: accept ~43% output compression and focus on the DUAL ENGINE architecture
+   (early exit + KV masking) where we already showed proof of concept
