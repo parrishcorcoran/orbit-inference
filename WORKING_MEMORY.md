@@ -172,3 +172,19 @@ NEXT STEPS:
 2. Try on BitNet with cached data (where 97% is proven) to validate our training pipeline
 3. Or: accept ~43% output compression and focus on the DUAL ENGINE architecture
    (early exit + KV masking) where we already showed proof of concept
+
+## FINAL: Qwen 3B rank-512 = 44.3% (same ceiling as 0.5B)
+Complete table:
+                    rank-32  rank-64  rank-128  rank-256  rank-512
+Qwen 0.5B (H=896)   33.8%   37.1%    40.6%     42.6%     —
+Qwen 3B   (H=2048)  33.4%   39.7%    43.0%     43.6%     44.3%
+BitNet 2B (H=2560)    —     97.0%      —         —        —
+
+CONCLUSION: The ~43% ceiling on Qwen is NOT a model size issue.
+It's either:
+1. BitNet architecture advantage (ternary = cleaner manifold)
+2. Hydra's architecture (residual connections, deeper) vs our simple enc→SiLU→dec
+3. Training recipe (Hydra was trained differently)
+
+The simple bottleneck (Linear→SiLU→Linear) plateaus at ~43% on standard models.
+Need either BitNet OR a more sophisticated bottleneck architecture.
